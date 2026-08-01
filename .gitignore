@@ -1,0 +1,14 @@
+# Banco de dados
+data/
+
+# Logs do rAthena
+rathena/log/
+
+# Saves temporários
+rathena/save/
+
+# Arquivos de build
+rathena/build/
+
+# Arquivos temporários
+*.log
