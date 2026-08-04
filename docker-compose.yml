@@ -16,6 +16,13 @@
 
     volumes:
       - ./data/mysql:/var/lib/mysql
+      - ./rathena/sql-files:/docker-entrypoint-initdb.d
+    
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
 
   phpmyadmin:
     image: phpmyadmin:latest
@@ -41,7 +48,8 @@
     command: ./login-server
 
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
     ports:
       - "6900:6900"
@@ -55,7 +63,8 @@
     command: ./char-server
 
     depends_on:
-      - login
+      login:
+        condition: service_started
 
     ports:
       - "6121:6121"
@@ -69,7 +78,8 @@
     command: ./map-server
 
     depends_on:
-      - char
+      char:
+        condition: service_started
 
     ports:
       - "5121:5121"

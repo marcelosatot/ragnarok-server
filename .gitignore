@@ -1,14 +1,28 @@
-# Banco de dados
-data/
+# Database
+data/mysql/
 
-# Logs do rAthena
+# Logs
 rathena/log/
 
-# Saves temporários
-rathena/save/
+# Crash dumps
+*.core
 
-# Arquivos de build
+# VSCode
+.vscode/
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+
+# Build
 rathena/build/
 
-# Arquivos temporários
-*.log
+# Cache
+rathena/db/import/
+
+# Backup
+*.bak
+*.old
