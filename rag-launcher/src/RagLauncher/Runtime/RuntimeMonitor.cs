@@ -1,38 +1,71 @@
+
 using System.Diagnostics;
 
 namespace RagLauncher.Runtime;
 
 internal sealed class RuntimeMonitor
 {
-    public async Task StartAsync(RuntimeStatistics statistics)
+    private readonly DateTime _startedAt = DateTime.Now;
+
+    public async Task StartAsync(RuntimeStatistics runtime)
     {
         while (true)
         {
-            Update(statistics);
+            Update(runtime);
 
             await Task.Delay(1000);
         }
     }
 
-    private static void Update(RuntimeStatistics statistics)
+    private void Update(RuntimeStatistics runtime)
     {
-        statistics.State.LoginOnline =
+        runtime.State.LoginOnline =
             Process.GetProcessesByName("login-server").Any();
 
-        statistics.State.CharOnline =
+        runtime.State.CharOnline =
             Process.GetProcessesByName("char-server").Any();
 
-        statistics.State.MapOnline =
+        runtime.State.MapOnline =
             Process.GetProcessesByName("map-server").Any();
 
-        statistics.State.LoginMemory =
+        runtime.State.DatabaseOnline =
+            Process.GetProcessesByName("mariadbd").Any();
+    }
+
+    private void UpdateMemory(RuntimeStatistics runtime)
+    {
+        runtime.State.MemoryMB =
+    Process.GetCurrentProcess().WorkingSet64 / 1024d / 1024d;
+
+        runtime.State.LoginMemory =
             GetMemory("login-server");
 
-        statistics.State.CharMemory =
+        runtime.State.CharMemory =
             GetMemory("char-server");
 
-        statistics.State.MapMemory =
+        runtime.State.MapMemory =
             GetMemory("map-server");
+    }
+
+    private void UpdateServers(RuntimeStatistics runtime)
+    {
+        runtime.State.LoginOnline =
+            Process.GetProcessesByName("login-server").Any();
+
+        runtime.State.CharOnline =
+            Process.GetProcessesByName("char-server").Any();
+
+        runtime.State.MapOnline =
+            Process.GetProcessesByName("map-server").Any();
+
+        runtime.State.DatabaseOnline =
+            Process.GetProcessesByName("mariadbd").Any();
+    }
+
+    private void UpdateUptime(RuntimeStatistics runtime)
+    {
+        runtime.State.Uptime =
+    DateTime.Now - runtime.State.StartedAt;
     }
 
     private static long GetMemory(string process)

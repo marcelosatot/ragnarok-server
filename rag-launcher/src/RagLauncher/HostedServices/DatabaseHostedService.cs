@@ -1,23 +1,31 @@
-using RagLauncher.Core.Hosting;
-using RagLauncher.Database;
 using RagLauncher.Accounts;
+using RagLauncher.Core.DI;
+using RagLauncher.Core.Environment;
+using RagLauncher.Database;
 
 namespace RagLauncher.HostedServices;
 
 internal sealed class DatabaseHostedService : IHostedService
 {
-    private readonly DatabaseManager _manager = new();
-    private readonly DatabaseInstaller _installer = new();
-    private readonly AccountService _accounts = new();
+    private readonly ServiceContainer _services;
+
+    public DatabaseHostedService(ServiceContainer services)
+    {
+        _services = services;
+    }
 
     public async Task StartAsync()
     {
-        await _manager.InitializeAsync(
-            @"C:\Users\satom\Documents\ragnarok-server\mariadb");
+        var env = _services.Get<AppEnvironment>();
 
-        await _installer.EnsureDatabaseAsync();
+        await _services.Get<DatabaseManager>()
+            .InitializeAsync(env.MariaDb);
 
-        await _accounts.EnsureAdminAccountAsync();
+        await _services.Get<DatabaseInstaller>()
+            .EnsureDatabaseAsync();
+
+        await _services.Get<AccountService>()
+            .EnsureAdminAccountAsync();
     }
 
     public Task StopAsync()

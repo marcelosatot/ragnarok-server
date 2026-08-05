@@ -1,9 +1,18 @@
+using RagLauncher.Core.Environment;
 using MySqlConnector;
 
 namespace RagLauncher.Database;
 
+using RagLauncher.Core.Environment;
+
 internal class DatabaseInstaller
 {
+    private readonly AppEnvironment _env;
+
+    public DatabaseInstaller(AppEnvironment env)
+    {
+        _env = env;
+    }
     private const string RootConnection =
         "Server=127.0.0.1;Port=3306;User ID=root;Password=;";
 
@@ -77,8 +86,9 @@ internal class DatabaseInstaller
 
     var runner = new SqlScriptRunner();
 
-    var root =
-        @"C:\Users\satom\Documents\ragnarok-server\rathena\sql-files";
+    var root = Path.Combine(
+    _env.Rathena,
+    "sql-files");
 
     await runner.ExecuteFileAsync(
         connection,

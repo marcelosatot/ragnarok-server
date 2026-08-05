@@ -1,6 +1,6 @@
 using RagLauncher.Logging;
 
-namespace RagLauncher.ConsoleUI;
+namespace RagLauncher.CommandLineUI;
 
 internal sealed class ConsoleLogRenderer
 {

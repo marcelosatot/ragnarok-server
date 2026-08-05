@@ -7,54 +7,64 @@ internal sealed class DashboardRenderer
 {
     public void Render(LauncherContext context)
     {
-        Console.Clear();
+        Console.SetCursorPosition(0, 0);
 
         Logger.Title("Rag Launcher");
 
         Console.WriteLine();
 
-        Console.WriteLine("Server Status");
-        Console.WriteLine("-----------------------------");
-
-        Print("Login", context.Runtime.State.LoginOnline);
-        Print("Char ", context.Runtime.State.CharOnline);
-        Print("Map  ", context.Runtime.State.MapOnline);
+        DrawStatus(context);
 
         Console.WriteLine();
 
-        Console.WriteLine("Memory");
-        Console.WriteLine("-----------------------------");
-
-        Console.WriteLine($"Login : {context.Runtime.State.LoginMemory} MB");
-        Console.WriteLine($"Char  : {context.Runtime.State.CharMemory} MB");
-        Console.WriteLine($"Map   : {context.Runtime.State.MapMemory} MB");
+        DrawMemory(context);
 
         Console.WriteLine();
 
-        Console.WriteLine("Players");
-        Console.WriteLine("-----------------------------");
-
-        Console.WriteLine($"Online : {context.Runtime.State.PlayersOnline}");
+        DrawRuntime(context);
 
         Console.WriteLine();
 
-        Console.WriteLine("Uptime");
-        Console.WriteLine("-----------------------------");
-
-        Console.WriteLine(DateTime.Now - context.Runtime.State.StartedAt);
-
-        Console.WriteLine();
-
-        Console.WriteLine("CTRL+C - Exit");
+        Console.WriteLine("Press CTRL+C to stop.");
     }
 
-    private static void Print(string server, bool online)
+    private static void DrawStatus(LauncherContext context)
     {
-        Console.Write(server.PadRight(8));
+        Console.WriteLine("STATUS");
+        Console.WriteLine("────────────────────────────────────");
 
-        if (online)
-            Console.WriteLine("ONLINE");
-        else
-            Console.WriteLine("OFFLINE");
+        Print("Database", context.Runtime.State.DatabaseOnline);
+        Print("Login", context.Runtime.State.LoginOnline);
+        Print("Char", context.Runtime.State.CharOnline);
+        Print("Map", context.Runtime.State.MapOnline);
+    }
+
+    private static void DrawMemory(LauncherContext context)
+    {
+        Console.WriteLine("MEMORY");
+        Console.WriteLine("────────────────────────────────────");
+
+        Console.WriteLine($"Launcher : {context.Runtime.State.MemoryMB:F1} MB");
+        Console.WriteLine($"Login    : {context.Runtime.State.LoginMemory} MB");
+        Console.WriteLine($"Char     : {context.Runtime.State.CharMemory} MB");
+        Console.WriteLine($"Map      : {context.Runtime.State.MapMemory} MB");
+    }
+
+    private static void DrawRuntime(LauncherContext context)
+    {
+        Console.WriteLine("RUNTIME");
+        Console.WriteLine("────────────────────────────────────");
+
+        Console.WriteLine($"Uptime   : {context.Runtime.State.Uptime:dd\\.hh\\:mm\\:ss}");
+        Console.WriteLine($"Players  : {context.Runtime.State.PlayersOnline}");
+        Console.WriteLine($"Restarts : {context.Runtime.State.RestartCount}");
+    }
+
+    private static void Print(string name, bool online)
+    {
+        var icon = online ? "[OK]" : "[--]";
+        var status = online ? "ONLINE" : "OFFLINE";
+
+        Console.WriteLine($"{icon,-6} {name,-10} {status}");
     }
 }

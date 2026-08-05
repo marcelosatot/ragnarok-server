@@ -2,7 +2,7 @@ using System.Diagnostics;
 
 namespace RagLauncher.Runtime;
 
-internal class ServerProcess
+internal sealed class ServerProcess
 {
     private readonly string _workingDirectory;
     private readonly string _executable;
@@ -13,6 +13,13 @@ internal class ServerProcess
     private readonly TaskCompletionSource<bool> _ready = new();
 
     public event Action<string>? OutputReceived;
+
+    public event Action? Exited;
+
+    public int? ProcessId => _process?.Id;
+
+    public bool IsRunning =>
+        _process is { HasExited: false };
 
     public ServerProcess(
         string workingDirectory,
@@ -47,7 +54,8 @@ internal class ServerProcess
 
             OutputReceived?.Invoke(e.Data);
 
-            if (e.Data.Contains(_readyMessage, StringComparison.OrdinalIgnoreCase))
+            if (e.Data.Contains(_readyMessage,
+                StringComparison.OrdinalIgnoreCase))
             {
                 _ready.TrySetResult(true);
             }
@@ -65,6 +73,8 @@ internal class ServerProcess
 
         _process.Exited += (_, _) =>
         {
+            Exited?.Invoke();
+
             if (!_ready.Task.IsCompleted)
             {
                 _ready.TrySetException(
@@ -91,8 +101,26 @@ internal class ServerProcess
         if (_process.HasExited)
             return;
 
-        _process.Kill(true);
+        try
+        {
+            _process.Kill(true);
+            _process.WaitForExit();
+        }
+        catch
+        {
+        }
+    }
 
-        _process.WaitForExit();
+    public long GetMemoryMB()
+    {
+        if (_process == null)
+            return 0;
+
+        if (_process.HasExited)
+            return 0;
+
+        _process.Refresh();
+
+        return _process.WorkingSet64 / 1024 / 1024;
     }
 }

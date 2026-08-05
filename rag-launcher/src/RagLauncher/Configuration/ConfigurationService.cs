@@ -1,11 +1,12 @@
 using System.Text.Json;
 using RagLauncher.Models;
+using RagLauncher.Core.Environment;
 
 namespace RagLauncher.Configuration;
 
 internal class ConfigurationService
 {
-    public ServerConfiguration Load()
+    public ServerConfiguration Load(AppEnvironment env)
     {
         Console.WriteLine("[Configuration] Loading configuration...");
 

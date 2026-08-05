@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RagLauncher")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+59094170e00ad614b91584007036d08ba24e94a6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+56ede87ee7ca26eca4dab9eef8115192a2ac9d62")]
 [assembly: System.Reflection.AssemblyProductAttribute("RagLauncher")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RagLauncher")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

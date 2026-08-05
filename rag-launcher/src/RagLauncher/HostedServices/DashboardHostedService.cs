@@ -1,15 +1,15 @@
 using RagLauncher.Core;
 using RagLauncher.Core.DI;
-using RagLauncher.Servers;
+using RagLauncher.Dashboard;
 
 namespace RagLauncher.HostedServices;
 
-internal sealed class ServerHostedService : IHostedService
+internal sealed class DashboardHostedService : IHostedService
 {
     private readonly ServiceContainer _services;
     private readonly LauncherContext _context;
 
-    public ServerHostedService(
+    public DashboardHostedService(
         ServiceContainer services,
         LauncherContext context)
     {
@@ -17,16 +17,17 @@ internal sealed class ServerHostedService : IHostedService
         _context = context;
     }
 
-    public async Task StartAsync()
+    public Task StartAsync()
     {
-        await _services.Get<ServerManager>()
-            .StartAsync(_context.Configuration!);
+        _ = _services
+            .Get<DashboardService>()
+            .StartAsync(_context);
+
+        return Task.CompletedTask;
     }
 
     public Task StopAsync()
     {
-        _services.Get<ServerManager>().Stop();
-
         return Task.CompletedTask;
     }
 }
