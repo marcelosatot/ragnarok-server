@@ -1,79 +1,109 @@
+using System.Diagnostics;
 using RagLauncher.Models;
 using RagLauncher.Runtime;
-using System.Threading.Tasks;
 
 namespace RagLauncher.Processes;
 
 internal class ProcessManager
 {
+    private readonly List<ServerProcess> _runningServers = new();
+
     public async Task InitializeAsync(ServerConfiguration configuration)
     {
-
         Console.WriteLine("[Process] Initializing...");
-
-        await StartServer(
-            configuration.Executables.Login,
-            configuration.RathenaDirectory);
-
-        await StartServer(
-            configuration.Executables.Char,
-            configuration.RathenaDirectory);
-
-        await StartServer(
-            configuration.Executables.Map,
-            configuration.RathenaDirectory);
-
         Console.WriteLine();
 
-        Console.WriteLine("[Process] Starting Login Server...");
+        KillExistingServers();
 
-        var login = new ServerProcess(
-            configuration.RathenaDirectory,
-            configuration.Executables.Login.Executable,
-            configuration.Executables.Login.ReadyMessage);
+        var workingDirectory = configuration.RathenaDirectory;
 
-        login.OutputReceived += line =>
+        await StartServer(
+            new ServerDefinition
+            {
+                Executable = "login-server.exe",
+                ReadyMessage = "ready"
+            },
+            workingDirectory);
+
+        await StartServer(
+            new ServerDefinition
+            {
+                Executable = "char-server.exe",
+                ReadyMessage = "ready"
+            },
+            workingDirectory);
+
+        await StartServer(
+            new ServerDefinition
+            {
+                Executable = "map-server.exe",
+                ReadyMessage = "ready"
+            },
+            workingDirectory);
+    }
+
+    private async Task StartServer(
+        ServerDefinition definition,
+        string workingDirectory)
+    {
+        Console.WriteLine($"[Process] Starting {definition.Executable}");
+
+        var process = new ServerProcess(
+            workingDirectory,
+            definition.Executable,
+            definition.ReadyMessage);
+
+        _runningServers.Add(process);
+
+        process.OutputReceived += line =>
+            Console.WriteLine($"[{definition.Executable}] {line}");
+
+        process.Start();
+
+        await process.WaitUntilReadyAsync();
+
+        Console.WriteLine($"[Process] {definition.Executable} READY");
+        Console.WriteLine();
+    }
+
+    private static void KillExistingServers()
+    {
+        var names = new[]
         {
-            Console.WriteLine($"[LOGIN] {line}");
+            "login-server",
+            "char-server",
+            "map-server"
         };
 
-        login.Start();
-
-        await login.WaitUntilReadyAsync();
-
-        Console.WriteLine();
-        Console.WriteLine("[Process] Login Server READY");
+        foreach (var name in names)
+        {
+            foreach (var process in Process.GetProcessesByName(name))
+            {
+                try
+                {
+                    process.Kill(true);
+                    process.WaitForExit();
+                }
+                catch
+                {
+                }
+            }
+        }
     }
 
-    private static void ValidateExecutable(string directory, string executable)
+    public void StopAll()
     {
-        var file = Path.Combine(directory, executable);
+        foreach (var process in _runningServers)
+        {
+            try
+            {
+                process.Stop();
+            }
+            catch
+            {
+            }
+        }
 
-        if (!File.Exists(file))
-            throw new FileNotFoundException(file);
-
-        Console.WriteLine($"[Process] {executable} OK");
-    }
-
-    private async Task StartServer(ServerDefinition server, string workingDirectory)
-    {
-    Console.WriteLine();
-    Console.WriteLine($"[Process] Starting {server.Executable}");
-
-    var process = new ServerProcess(
-        workingDirectory,
-        server.Executable,
-        server.ReadyMessage);
-
-    process.OutputReceived += line =>
-    {
-        Console.WriteLine($"[{server.Executable}] {line}");
-    };
-
-    process.Start();
-
-    await process.WaitUntilReadyAsync();
-
-    Console.WriteLine($"[Process] {server.Executable} READY");
+        _runningServers.Clear();
     }
 }

@@ -2,7 +2,7 @@ namespace RagLauncher.Models;
 
 internal class ServerDefinition
 {
-    public string Executable { get; set; } = "";
+    public string Executable { get; init; } = "";
 
-    public string ReadyMessage { get; set; } = "";
+    public string ReadyMessage { get; init; } = "";
 }

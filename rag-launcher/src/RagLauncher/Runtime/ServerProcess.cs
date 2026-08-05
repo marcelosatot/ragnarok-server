@@ -6,17 +6,11 @@ internal class ServerProcess
 {
     private readonly string _workingDirectory;
     private readonly string _executable;
+    private readonly string _readyMessage;
 
     private Process? _process;
 
     private readonly TaskCompletionSource<bool> _ready = new();
-
-    private readonly string _readyMessage;
-
-    public Task WaitUntilReadyAsync()
-    {
-        return _ready.Task;
-    }
 
     public event Action<string>? OutputReceived;
 
@@ -46,9 +40,9 @@ internal class ServerProcess
             CreateNoWindow = true
         };
 
-       _process.OutputDataReceived += (_, e) =>
+        _process.OutputDataReceived += (_, e) =>
         {
-            if (e.Data is null)
+            if (string.IsNullOrWhiteSpace(e.Data))
                 return;
 
             OutputReceived?.Invoke(e.Data);
@@ -61,22 +55,44 @@ internal class ServerProcess
 
         _process.ErrorDataReceived += (_, e) =>
         {
-            if (e.Data is null)
+            if (string.IsNullOrWhiteSpace(e.Data))
                 return;
 
             OutputReceived?.Invoke($"ERROR: {e.Data}");
         };
 
-        _process.Start();
         _process.EnableRaisingEvents = true;
 
         _process.Exited += (_, _) =>
         {
-            _ready.TrySetException(
-                new Exception($"{_executable} exited before becoming READY."));
+            if (!_ready.Task.IsCompleted)
+            {
+                _ready.TrySetException(
+                    new Exception($"{_executable} exited before becoming READY."));
+            }
         };
+
+        _process.Start();
 
         _process.BeginOutputReadLine();
         _process.BeginErrorReadLine();
+    }
+
+    public Task WaitUntilReadyAsync()
+    {
+        return _ready.Task;
+    }
+
+    public void Stop()
+    {
+        if (_process == null)
+            return;
+
+        if (_process.HasExited)
+            return;
+
+        _process.Kill(true);
+
+        _process.WaitForExit();
     }
 }

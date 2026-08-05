@@ -1,7 +1,8 @@
 using RagLauncher.Configuration;
 using RagLauncher.Database;
-using RagLauncher.Processes;
+using RagLauncher.Servers;
 using RagLauncher.Validation;
+using RagLauncher.Accounts;
 
 namespace RagLauncher.Services;
 
@@ -18,8 +19,10 @@ internal class LauncherService
             @"C:\Users\satom\Documents\ragnarok-server\mariadb");
 
         var installer = new DatabaseInstaller();
-
         await installer.EnsureDatabaseAsync();
+
+        var accountService = new AccountService();
+        await accountService.EnsureAdminAccountAsync();
 
         var configurationService = new ConfigurationService();
 
@@ -35,12 +38,14 @@ internal class LauncherService
 
         Console.WriteLine();
 
-        var processManager = new ProcessManager();
+        var serverManager = new ServerManager();
 
-        await processManager.InitializeAsync(configuration);
+        await serverManager.StartAsync(configuration);
 
         Console.WriteLine();
+        Console.WriteLine("[Launcher] READY");
+        Console.WriteLine("[Launcher] Press CTRL+C to stop.");
 
-        Console.WriteLine("[Launcher] Ready!");
+        await Task.Delay(Timeout.Infinite);
     }
 }
