@@ -1,0 +1,23 @@
+{
+  "ServerName": "Rag Server",
+  "Version": "0.1.0",
+
+  "RathenaDirectory": "rathena",
+
+  "Executables": {
+    "Login": {
+      "Executable": "login-server.exe",
+      "ReadyMessage": "The login-server is ready"
+    },
+
+    "Char": {
+      "Executable": "char-server.exe",
+      "ReadyMessage": "The char-server is ready"
+    },
+
+    "Map": {
+      "Executable": "map-server.exe",
+      "ReadyMessage": "The map-server is ready"
+    }
+  }
+}
