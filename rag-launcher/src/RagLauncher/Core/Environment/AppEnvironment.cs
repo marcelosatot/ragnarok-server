@@ -10,14 +10,10 @@ internal sealed class AppEnvironment
 
     public AppEnvironment()
     {
-        Root = Directory.GetParent(AppContext.BaseDirectory)!
-                        .Parent!
-                        .Parent!
-                        .Parent!
-                        .FullName;
+        Root = AppContext.BaseDirectory;
 
         MariaDb = Path.Combine(Root, "mariadb");
 
-        Rathena = Path.Combine(Root, "rathena");
+        Rathena = Root;
     }
 }

@@ -4,19 +4,12 @@ internal static class PathResolver
 {
     public static string Resolve(string path)
     {
-        var current = new DirectoryInfo(Environment.CurrentDirectory);
+        var candidate = Path.Combine(AppContext.BaseDirectory, path);
 
-        while (current != null)
-        {
-            var candidate = Path.Combine(current.FullName, path);
-
-            if (Directory.Exists(candidate))
-                return candidate;
-
-            current = current.Parent;
-        }
+        if (Directory.Exists(candidate))
+            return candidate;
 
         throw new DirectoryNotFoundException(
-            $"Unable to locate '{path}' starting from '{Environment.CurrentDirectory}'.");
+            $"Directory '{candidate}' was not found.");
     }
 }

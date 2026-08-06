@@ -2,7 +2,7 @@
   "ServerName": "Rag Server",
   "Version": "0.1.0",
 
-  "RathenaDirectory": "rathena",
+  "RathenaDirectory": ".",
 
   "Executables": {
     "Login": {
