@@ -1,7 +1,14 @@
-using RagLauncher.Core.DI;
-using RagLauncher.Logging;
-using RagLauncher.HostedServices;
 using RagLauncher.CommandLine;
+using RagLauncher.Configuration;
+using RagLauncher.Core.DI;
+using RagLauncher.Dashboard;
+using RagLauncher.Logging;
+using RagLauncher.Runtime;
+using RagLauncher.Accounts;
+using RagLauncher.Database;
+using RagLauncher.Servers;
+using RagLauncher.Validation;
+using RagLauncher.Core.Environment;
 
 namespace RagLauncher.Core;
 
@@ -12,61 +19,64 @@ internal sealed class LauncherHost
     private readonly ServiceContainer _services =
         Bootstrapper.Build();
 
-
-    private void RegisterHostedServices()
-{
-    var manager = _services.Get<HostedServiceManager>();
-
-    manager.Register(
-        new DatabaseHostedService(_services));
-
-    manager.Register(
-        new ConfigurationHostedService(
-            _services,
-            _context));
-
-    manager.Register(
-        new ServerHostedService(
-            _services,
-            _context));
-
-    manager.Register(
-        new RuntimeHostedService(
-            _services,
-            _context));
-
-    manager.Register(
-        new DashboardHostedService(
-            _services,
-            _context));
-}
-
     public async Task RunAsync()
     {
         Logger.Info("Starting Rag Launcher...");
         Logger.Line();
 
-        RegisterHostedServices();
+        await InitializeAsync();
 
-        await _services
-            .Get<HostedServiceManager>()
-            .StartAsync();
+        _ = _services
+            .Get<RuntimeMonitor>()
+            .StartAsync(_context.Runtime);
+
+        _ = _services
+            .Get<DashboardService>()
+            .StartAsync(_context);
+
+        _ = _services
+            .Get<CommandHost>()
+            .RunAsync();
+
+        _ = _services
+            .Get<ServerWatcher>()
+            .RunAsync();
 
         Logger.Success("Launcher READY");
-        _ = _services
-    .Get<CommandHost>()
-    .RunAsync();
         Logger.Info("Press CTRL+C to stop.");
 
-        _services.Get<EventLog>()
-        .Add("Launcher started");
-        
-
-        await WaitForShutdown();
+        await Task.Delay(Timeout.Infinite);
     }
 
-    private static async Task WaitForShutdown()
+    private async Task InitializeAsync()
     {
-        await Task.Delay(Timeout.Infinite);
+        await _services
+            .Get<DatabaseManager>()
+            .InitializeAsync(
+                @"C:\Users\satom\Documents\ragnarok-server\mariadb");
+
+        await _services
+            .Get<DatabaseInstaller>()
+            .EnsureDatabaseAsync();
+
+        await _services
+            .Get<AccountService>()
+            .EnsureAdminAccountAsync();
+
+        var configuration =
+            _services
+                .Get<ConfigurationService>()
+                .Load(
+                    _services.Get<AppEnvironment>());
+
+        _context.Configuration = configuration;
+
+        _services
+            .Get<ValidationService>()
+            .Validate(configuration);
+
+        await _services
+            .Get<ServerManager>()
+            .StartAsync(configuration);
     }
 }

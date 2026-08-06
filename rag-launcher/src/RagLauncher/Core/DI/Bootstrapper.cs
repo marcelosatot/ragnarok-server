@@ -35,6 +35,8 @@ internal static class Bootstrapper
 
         services.AddSingleton(new ValidationService());
 
+        services.AddSingleton(new ServerManager());
+
         services.AddSingleton(new RuntimeMonitor());
 
         services.AddSingleton(new DashboardService());
@@ -43,6 +45,10 @@ internal static class Bootstrapper
 
         services.AddSingleton(
         new CommandHost(
+            services.Get<ServerManager>()));
+
+        services.AddSingleton(
+        new ServerWatcher(
             services.Get<ServerManager>()));
 
         return services;
