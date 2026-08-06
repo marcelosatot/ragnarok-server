@@ -50,10 +50,10 @@ internal sealed class LauncherHost
 
     private async Task InitializeAsync()
     {
-        await _services
-            .Get<DatabaseManager>()
-            .InitializeAsync(
-                @"C:\Users\satom\Documents\ragnarok-server\mariadb");
+            await _services
+                .Get<DatabaseManager>()
+                .InitializeAsync(
+                    AppPaths.MariaDb);
 
         await _services
             .Get<DatabaseInstaller>()
