@@ -207,7 +207,7 @@ e_tower,81,105,0	script	Tower Protection Stone	406,{
 	set .@party_id,getcharid(1);
 	set .@md_name$,"Endless Tower";
 
-	set .@etower_timer,checkquest(60200,PLAYTIME); // 1 week
+	set .@etower_timer,checkquest(60200,PLAYTIME); // 2 hours and 24 minutes between entries
 	set .@etower_timer2,checkquest(60201,PLAYTIME); // 4 hours
 
 	if (!instance_check_party(.@party_id,2)) {
@@ -269,7 +269,7 @@ e_tower,81,105,0	script	Tower Protection Stone	406,{
 				close;
 			}
 		} else {
-			set .@dun_lim_time,etower_timer+604800; // 1 week
+			set .@dun_lim_time,etower_timer+8640; // 2 hours and 24 minutes
 			// set .@dun_lim_time2,etower_timer+14400; // 4 hours
 			set .@dun_cur_time,gettimetick(2);
 			set .@dun_ent_t,(.@dun_lim_time - .@dun_cur_time);

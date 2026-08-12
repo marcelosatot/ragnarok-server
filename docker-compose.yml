@@ -51,6 +51,10 @@
       db:
         condition: service_healthy
 
+    # Development mounts: configuration changes do not require an image rebuild.
+    volumes:
+      - ./rathena/conf:/rathena/conf
+
     ports:
       - "6900:6900"
 
@@ -66,6 +70,10 @@
       login:
         condition: service_started
 
+    # Development mounts: configuration changes do not require an image rebuild.
+    volumes:
+      - ./rathena/conf:/rathena/conf
+
     ports:
       - "6121:6121"
 
@@ -80,6 +88,12 @@
     depends_on:
       char:
         condition: service_started
+
+    # Development mounts: configs, databases and NPC scripts stay synchronized.
+    volumes:
+      - ./rathena/conf:/rathena/conf
+      - ./rathena/db:/rathena/db
+      - ./rathena/npc:/rathena/npc
 
     ports:
       - "5121:5121"

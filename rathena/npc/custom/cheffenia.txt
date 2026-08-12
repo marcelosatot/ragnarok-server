@@ -1,0 +1,156 @@
+//===== rAthena Script =======================================
+//= Cheffenia customizada baseada na Bossnia oficial
+//===== Description: =========================================
+//= Quatro mapas publicos separados por faixas de dificuldade.
+//= A composicao de cada mapa e sorteada no OnInit, portanto
+//= @reloadscript gera uma nova escalaacao.
+//============================================================
+
+// Entrada principal. A Bossnia oficial deve permanecer desabilitada
+// em npc/scripts_athena.conf para evitar NPCs e spawns duplicados.
+prontera,132,125,4	script	Gerente da Cheffenia	908,{
+	mes "[Gerente da Cheffenia]";
+	mes "Escolha a dificuldade da arena de MVPs.";
+	mes "Cada faixa possui um conjunto diferente de monstros.";
+	next;
+	if (Zeny < 5000) {
+		mes "A entrada custa ^FF00005.000 Zeny^000000.";
+		mes "Voce nao possui Zeny suficiente.";
+		close;
+	}
+	set .@difficulty, select(
+		"Facil",
+		"Intermediaria",
+		"Dificil",
+		"Extrema",
+		"Cancelar"
+	);
+	if (.@difficulty == 5)
+		close;
+
+	mes "A entrada custa ^FF00005.000 Zeny^000000.";
+	mes "Deseja entrar na dificuldade escolhida?";
+	if (select("Entrar:Cancelar") == 2)
+		close;
+
+	set Zeny, Zeny - 5000;
+	set .@map$, "bossnia_0" + .@difficulty;
+	warp .@map$, rand(202,204), rand(202,204);
+	end;
+}
+
+// Controlador invisivel dos spawns aleatorios.
+// As faixas sao sobrepostas de proposito:
+// Facil = dificuldades 1-2; Intermediaria = 2-3;
+// Dificil = 3-4; Extrema = 4.
+-	script	CheffeniaManager	-1,{
+OnInit:
+	// Pools baseados na coluna Dificuldade da lista de MVPs.
+	// Os IDs sao os IDs Renewal presentes no mob_db.yml.
+	setarray .EasyPool[0],
+		1112, // Drake - dificuldade 1
+		1115, // Eddga - dificuldade 1
+		1087, // Orc Hero - dificuldade 2
+		1086, // Golden Thief Bug - dificuldade 2
+		1312, // Turtle General - dificuldade 2
+		1685, // Vesper - dificuldade 2
+		1734, // Kiel D-01 - dificuldade 2
+		1871, // Falling Bishop - dificuldade 2
+		1658; // Egnigem Cenia - dificuldade 2
+
+	setarray .IntermediatePool[0],
+		1087,1115,1086,1312,1685,1734,1871,1658,
+		1159,1046,1059,1688,1511,1039,1157,1373,
+		1785,1583,1623,1492,1150,1719,1708,1418;
+
+	setarray .HardPool[0],
+		1159,1046,1059,1688,1511,1039,1157,1373,
+		1785,1583,1623,1492,1150,1719,1708,1418,
+		1252,1147,1190,1389,1038,1251,1779,1272,
+		1768,1647,1648,1873,1751,1832;
+
+	setarray .ExtremePool[0],
+		1252,1147,1190,1389,1038,1251,1779,1272,
+		1768,1647,1648,1873,1751,1832;
+
+	set .@easy_event$, strnpcinfo(3) + "::OnEasyMvpDead";
+	set .@intermediate_event$, strnpcinfo(3) + "::OnIntermediateMvpDead";
+	set .@hard_event$, strnpcinfo(3) + "::OnHardMvpDead";
+	set .@extreme_event$, strnpcinfo(3) + "::OnExtremeMvpDead";
+
+	// @reloadscript nao remove monstros criados pelo comando monster.
+	// O label permite limpar somente os monstros desta Cheffenia.
+	killmonster "bossnia_01",.@easy_event$;
+	killmonster "bossnia_02",.@intermediate_event$;
+	killmonster "bossnia_03",.@hard_event$;
+	killmonster "bossnia_04",.@extreme_event$;
+
+	// Facil: 9 MVPs unicos, escolhidos entre dificuldades 1 e 2.
+	deletearray .@pool[0],getarraysize(.@pool);
+	copyarray .@pool[0],.EasyPool[0],getarraysize(.EasyPool);
+	for (set .@i,0; .@i<9; set .@i,.@i+1) {
+		set .@pick,rand(getarraysize(.@pool));
+		monster "bossnia_01",0,0,"--ja--",.@pool[.@pick],1,.@easy_event$;
+		deletearray .@pool[.@pick],1;
+	}
+
+	// Intermediaria: 14 MVPs unicos, escolhidos entre dificuldades 2 e 3.
+	deletearray .@pool[0],getarraysize(.@pool);
+	copyarray .@pool[0],.IntermediatePool[0],getarraysize(.IntermediatePool);
+	for (set .@i,0; .@i<14; set .@i,.@i+1) {
+		set .@pick,rand(getarraysize(.@pool));
+		monster "bossnia_02",0,0,"--ja--",.@pool[.@pick],1,.@intermediate_event$;
+		deletearray .@pool[.@pick],1;
+	}
+
+	// Dificil: 10 MVPs unicos, escolhidos entre dificuldades 3 e 4.
+	deletearray .@pool[0],getarraysize(.@pool);
+	copyarray .@pool[0],.HardPool[0],getarraysize(.HardPool);
+	for (set .@i,0; .@i<10; set .@i,.@i+1) {
+		set .@pick,rand(getarraysize(.@pool));
+		monster "bossnia_03",0,0,"--ja--",.@pool[.@pick],1,.@hard_event$;
+		deletearray .@pool[.@pick],1;
+	}
+
+	// Extrema: 6 MVPs unicos, todos da dificuldade 4.
+	deletearray .@pool[0],getarraysize(.@pool);
+	copyarray .@pool[0],.ExtremePool[0],getarraysize(.ExtremePool);
+	for (set .@i,0; .@i<6; set .@i,.@i+1) {
+		set .@pick,rand(getarraysize(.@pool));
+		monster "bossnia_04",0,0,"--ja--",.@pool[.@pick],1,.@extreme_event$;
+		deletearray .@pool[.@pick],1;
+	}
+	end;
+
+
+OnEasyMvpDead:
+	// Spawns dinamicos nao renascem sozinhos; reagendamos o mesmo MVP.
+	set .@mob_id,killedrid;
+	sleep 1800000;
+	monster "bossnia_01",0,0,"--ja--",.@mob_id,1,strnpcinfo(3)+"::OnEasyMvpDead";
+	end;
+
+OnIntermediateMvpDead:
+	set .@mob_id,killedrid;
+	sleep 3600000;
+	monster "bossnia_02",0,0,"--ja--",.@mob_id,1,strnpcinfo(3)+"::OnIntermediateMvpDead";
+	end;
+
+OnHardMvpDead:
+	set .@mob_id,killedrid;
+	sleep 7200000;
+	monster "bossnia_03",0,0,"--ja--",.@mob_id,1,strnpcinfo(3)+"::OnHardMvpDead";
+	end;
+
+OnExtremeMvpDead:
+	set .@mob_id,killedrid;
+	sleep 7200000;
+	monster "bossnia_04",0,0,"--ja--",.@mob_id,1,strnpcinfo(3)+"::OnExtremeMvpDead";
+	end;
+}
+
+// Portais de saida.
+bossnia_01,204,204,0	warp	cheffenia_exit_01	1,1,prontera,155,180
+bossnia_02,204,204,0	warp	cheffenia_exit_02	1,1,prontera,155,180
+bossnia_03,204,204,0	warp	cheffenia_exit_03	1,1,prontera,155,180
+bossnia_04,204,204,0	warp	cheffenia_exit_04	1,1,prontera,155,180

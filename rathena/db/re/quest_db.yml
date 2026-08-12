@@ -9099,7 +9099,7 @@ Body:
     Title: Meeting Hugin
   - Id: 12317
     Title: Trace of Time Travel
-    TimeLimit: 4h
+    TimeLimit: +2h24mn
   - Id: 12318
     Title: Corrupted Soul Hunt
     Targets:
@@ -13325,7 +13325,7 @@ Body:
         Count: 150
   - Id: 60200
     Title: Endless Tower Effect
-    TimeLimit: +7d
+    TimeLimit: +2h24mn
   - Id: 60201
     Title: Endless Tower Time Limit
     TimeLimit: +4h
