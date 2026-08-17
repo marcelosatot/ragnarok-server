@@ -51,6 +51,11 @@ struct quest *mapif_quests_fromsql( uint32 char_id, size_t& count ){
 
 		questlog = (struct quest *)aCalloc( count, sizeof( struct quest ) );
 		while( SQL_SUCCESS == stmt.NextRow() ) {
+			// Endless Tower used these legacy timer quests. They are no longer
+			// used by the script and some clients crash when they receive them.
+			if (tmp_quest.quest_id == 60200 || tmp_quest.quest_id == 60201)
+				continue;
+
 			// Sanity check, should never happen
 			if( i >= count ){
 				break;

@@ -14,11 +14,13 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /rathena
 
+ARG PACKETVER=20260219
+
 COPY rathena/ .
 
 RUN mkdir -p build \
  && cd build \
- && cmake .. \
+ && cmake .. -DPACKETVER=${PACKETVER} \
  && make -j"$(nproc)"
 
 WORKDIR /rathena

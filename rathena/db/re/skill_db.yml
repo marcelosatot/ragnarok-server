@@ -19706,6 +19706,7 @@ Body:
       Splash: true
     Flags:
       AlterRangeRadius: true
+      IsAutoShadowSpell: true
     Range: 11
     Hit: Multi_Hit
     HitCount: -10

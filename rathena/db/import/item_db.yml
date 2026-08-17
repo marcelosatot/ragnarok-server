@@ -1,0 +1,77 @@
+Header:
+  Type: ITEM_DB
+  Version: 3
+
+# Client compatibility fallback for Miracle Blue Rose (ID 5878).
+# The original item remains a lower headgear with its original bonuses.
+# Flu_Mask is a known client resource for the same equipment position.
+Body:
+  - Id: 5878
+    View: 8
+    AliasName: Flu_Mask
+
+# Keep Oni Horns' server-side name, description and bonuses, but use a
+# known upper-head view until the Oni_Horns_ resource is installed.
+  - Id: 5906
+    View: 562
+
+# Keep Tengu Scroll's server-side name, description and bonuses, but use the
+# existing Ninja Scroll visual until the Tengu Scroll resource is installed.
+  - Id: 19112
+    View: 370
+
+# Keep Kardui Ear's original name, description and bonuses, but use the
+# existing bunny-ear visual until the Kardui_Ear resource is installed.
+  - Id: 5966
+    View: 249
+
+# Magic Floating Stone (19393) already exists in the base database as
+# Magic_Star_TW. This import keeps that item ID and completes its missing
+# variable cast-time bonus. The native Magic_Star_TW effect is omitted because
+# this client does not contain its stoneofint2.str texture and crashes on equip.
+  - Id: 19393
+    View: 1760
+    Script: |
+      bonus bVariableCastrate,-5;
+      bonus2 bMagicAtkEle,Ele_Neutral,2*(readparam(bStr)/12);
+      bonus2 bMagicAtkEle,Ele_Wind,2*(readparam(bAgi)/12);
+      bonus2 bMagicAtkEle,Ele_Water,2*(readparam(bVit)/12);
+      bonus2 bMagicAtkEle,Ele_Fire,2*(readparam(bInt)/12);
+      bonus2 bMagicAtkEle,Ele_Earth,2*(readparam(bDex)/12);
+      bonus2 bMagicAtkEle,Ele_Holy,2*(readparam(bLuk)/12);
+    UnEquipScript: ""
+
+# Hybrid Bow [2] (700132) / Triangle_Disaster_LT.
+# The item is absent from the base database, so its complete server
+# definition is kept here as a local import.
+  - Id: 700132
+    AegisName: Triangle_Disaster_LT
+    Name: Hybrid Bow
+    Type: Weapon
+    SubType: Bow
+    Weight: 200
+    Attack: 150
+    Range: 5
+    Slots: 2
+    Jobs:
+      Rogue: true
+    Classes:
+      All_Third: true
+      Fourth: true
+    Locations:
+      Both_Hand: true
+    WeaponLevel: 4
+    EquipLevelMin: 100
+    Refineable: true
+    Script: |
+      .@r = getrefine();
+      bonus bMatk,150;
+      bonus bMatk,10*(.@r/2);
+      bonus bAspdRate,2*(.@r/3);
+      if (.@r >= 7)
+         bonus bPerfectHitAddRate,20;
+      if (.@r >= 9)
+         bonus2 bMagicAddSize,Size_All,10;
+      if (.@r >= 11)
+         bonus2 bMagicAtkEle,Ele_All,15;
+      autobonus3 "{ bonus2 bSkillAtk,\"WL_SOULEXPANSION\",20; bonus2 bSkillAtk,\"WL_EARTHSTRAIN\",20; bonus2 bSkillAtk,\"WL_CRIMSONROCK\",20; bonus2 bSkillAtk,\"SO_DIAMONDDUST\",20; bonus2 bSkillAtk,\"WL_CHAINLIGHTNING\",20; bonus2 bSkillAtk,\"SO_PSYCHIC_WAVE\",20; bonus2 bSkillAtk,\"AB_JUDEX\",20; bonus2 bSkillAtk,\"SO_CLOUD_KILL\",20; }",1000,20000,"SC_INVISIBILITY";

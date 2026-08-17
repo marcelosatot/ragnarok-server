@@ -1,0 +1,92 @@
+# This file is a part of rAthena.
+#   Copyright(C) 2022 rAthena Development Team
+#   https://rathena.org - https://github.com/rathena
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+###########################################################################
+# Item Combo Database
+###########################################################################
+#
+# Settings
+#
+###########################################################################
+# - Combos:                 List of combo sets.
+#    - Combo:               Sequence of items to define a combo (minimum of 2 items).
+#       - <item name>       AEGIS name of the item
+#   Script                  Script to execute when one of the combos is equipped. (Default: null)
+#   Clear                   Remove the defined combos from database. (Default: false)
+###########################################################################
+
+Header:
+  Type: COMBO_DB
+  Version: 1
+
+Body:
+  - Combos:
+      - Combo:
+          - Triangle_Disaster_LT # 700132
+          - Immatrial_Arrow # 1757
+    Script: |
+      bonus2 bSkillAtk,"WL_SOULEXPANSION",10;
+      bonus5 bAutoSpell,"WL_SOULEXPANSION",3,100,BF_LONG|BF_WEAPON|BF_NORMAL,1;
+  - Combos:
+      - Combo:
+          - Triangle_Disaster_LT # 700132
+          - Stone_Arrow # 1756
+    Script: |
+      bonus2 bSkillAtk,"WL_EARTHSTRAIN",10;
+      bonus5 bAutoSpell,"WL_EARTHSTRAIN",3,100,BF_LONG|BF_WEAPON|BF_NORMAL,1;
+  - Combos:
+      - Combo:
+          - Triangle_Disaster_LT # 700132
+          - Fire_Arrow # 1752
+    Script: |
+      bonus2 bSkillAtk,"WL_CRIMSONROCK",10;
+      bonus5 bAutoSpell,"WL_CRIMSONROCK",3,100,BF_LONG|BF_WEAPON|BF_NORMAL,1;
+  - Combos:
+      - Combo:
+          - Triangle_Disaster_LT # 700132
+          - Crystal_Arrow # 1754
+    Script: |
+      bonus2 bSkillAtk,"SO_DIAMONDDUST",10;
+      bonus5 bAutoSpell,"SO_DIAMONDDUST",3,100,BF_LONG|BF_WEAPON|BF_NORMAL,1;
+  - Combos:
+      - Combo:
+          - Triangle_Disaster_LT # 700132
+          - Arrow_Of_Wind # 1755
+    Script: |
+      bonus2 bSkillAtk,"WL_CHAINLIGHTNING",10;
+      bonus5 bAutoSpell,"WL_CHAINLIGHTNING",3,100,BF_LONG|BF_WEAPON|BF_NORMAL,1;
+  - Combos:
+      - Combo:
+          - Triangle_Disaster_LT # 700132
+          - Arrow_Of_Elf # 1773
+    Script: |
+      bonus2 bSkillAtk,"SO_PSYCHIC_WAVE",10;
+      bonus5 bAutoSpell,"SO_PSYCHIC_WAVE",3,100,BF_LONG|BF_WEAPON|BF_NORMAL,1;
+  - Combos:
+      - Combo:
+          - Triangle_Disaster_LT # 700132
+          - Silver_Arrow # 1751
+    Script: |
+      bonus2 bSkillAtk,"AB_JUDEX",10;
+      bonus5 bAutoSpell,"AB_JUDEX",5,100,BF_LONG|BF_WEAPON|BF_NORMAL,1;
+  - Combos:
+      - Combo:
+          - Triangle_Disaster_LT # 700132
+          - Rusty_Arrow # 1762
+    Script: |
+      bonus2 bSkillAtk,"SO_CLOUD_KILL",10;
+      bonus5 bAutoSpell,"SO_CLOUD_KILL",3,100,BF_LONG|BF_WEAPON|BF_NORMAL,1;
