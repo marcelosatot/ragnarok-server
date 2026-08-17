@@ -469,6 +469,14 @@ dali,72,55,4	script	Interdimensional Device	CLEAR_NPC,{
 	mes "[" + .@player_name$ + "]";
 	mes "Faceworm? I've never heard about it.";
 	unittalk .@account_id, .@player_name$ + ": Faceworm? I've never heard about it.";
+	next;
+	mes "[Chaos]";
+	mes "Choose the difficulty of the Faceworm's Nest.";
+	next;
+	if (select("Easy Mode:Hard Mode") == 2)
+		'hard = 1;
+	else
+		'hard = 0;
 	close2;
 	donpcevent instance_npcname("Chaos#01") + "::OnStart";
 	end;
@@ -504,6 +512,7 @@ OnStart:
 	sleep 6000;
 	hideonnpc instance_npcname("Chaos#01");
 	hideonnpc instance_npcname("Iris#0");
+	mapannounce 'map_name$, ( 'hard ? "Hard Mode selected. 143 faceworms will appear per phase." : "Easy Mode selected. 33 faceworms will appear per phase." ),bc_map,"0xffffff";
 	donpcevent instance_npcname("#fwormcontrol1") + "::OnStart";
 	mapannounce 'map_name$, "Faceworm time attack has started. Faster kill times gives a higher percentage of rewards.",bc_map,"0xffffff";
 	donpcevent instance_npcname("#fwormprize1") + "::OnStart";
@@ -525,7 +534,7 @@ OnInstanceInit:
 1@face,1,5,3	script	#fwormcontrol1	CLEAR_NPC,{
 	end;
 OnStart:
-	.@mob_c = getmapusers('map_name$) + 1;
+	.@mob_c = ( 'hard ? 13 : 3 );
 	.@event$ = instance_npcname("#fwormcontrol1") + "::OnMyMobDead";
 	killmonster 'map_name$, .@event$;
 	areamonster 'map_name$,65,330,179,336,"Faceworm",2528, (.@mob_c*2), .@event$;
@@ -558,6 +567,8 @@ OnStart:
 	.@MOB_HP = 5200000 - .@dfacehp;
 	if (.@MOB_HP < 1500000)
 		.@MOB_HP = 1500000;
+	if (!'hard)
+		.@MOB_HP /= 2;
 	setunitdata 'BOSS[1], UMOB_HP, .@MOB_HP;
 	initnpctimer;
 	end;
@@ -637,7 +648,10 @@ S_Heal:
 	getunitdata 'BOSS[1], .@arr;
 	.@r_hpp = (.@mapcount + 1) * getarg(1);
 	.@dfacehp = .@arr[UMOB_HP] + .@r_hpp;
-	.@r_hpp2 = 5200000 - ( (13-.@mapcount) * 200000 );
+	if ('hard)
+		.@r_hpp2 = 5200000 - ( (13-.@mapcount) * 200000 );
+	else
+		.@r_hpp2 = ( 5200000 - ( (13-.@mapcount) * 200000 ) ) / 2;
 	if (.@dfacehp > .@r_hpp2)
 		.@dfacehp = .@r_hpp2;
 	setunitdata 'BOSS[1], UMOB_HP, .@dfacehp;
@@ -762,7 +776,7 @@ OnInstanceInit:
 1@face,2,5,3	script	#fwormcontrol2	CLEAR_NPC,{
 	end;
 OnStart:
-	.@mob_c = getmapusers('map_name$) + 1;
+	.@mob_c = ( 'hard ? 13 : 3 );
 	.@event$ = instance_npcname("#fwormcontrol2") + "::OnMyMobDead";
 	areamonster 'map_name$,107,102,113,154,"Faceworm",2528, (.@mob_c*2), .@event$;
 	areamonster 'map_name$,115,175,121,209,"Faceworm",2528, (.@mob_c*2), .@event$;
@@ -794,6 +808,8 @@ OnStart:
 	.@MOB_HP = 5200000 - .@dfacehp;
 	if (.@MOB_HP < 1500000)
 		.@MOB_HP = 1500000;
+	if (!'hard)
+		.@MOB_HP /= 2;
 	setunitdata 'BOSS[2], UMOB_HP, .@MOB_HP;
 	initnpctimer;
 	end;
@@ -952,7 +968,7 @@ OnInstanceInit:
 1@face,2,5,3	script	#fwormcontrol3	CLEAR_NPC,{
 	end;
 OnStart:
-	.@mon_num = ( getmapusers('map_name$) + 1 ) * 11;
+	.@mon_num = ( 'hard ? 143 : 33 );
 	areamonster 'map_name$,238,274,308,344,"Faceworm",2528,.@mon_num,instance_npcname("#fwormcontrol3") + "::OnMyMobDead";
 	end;
 OnMyMobDead:
@@ -980,6 +996,8 @@ OnStart:
 	.@MOB_HP = 5200000 - ( (13 - getmapusers('map_name$)) * 200000 );
 	if (.@MOB_HP < 1500000)
 		.@MOB_HP = 1500000;
+	if (!'hard)
+		.@MOB_HP /= 2;
 	setunitdata 'BOSS[3], UMOB_HP, .@MOB_HP;
 	initnpctimer;
 	end;
@@ -1017,7 +1035,10 @@ OnHeal01:
 	getunitdata 'BOSS[3], .@arr;
 	.@r_hpp = ((.@mapcount+1) * 5000) * rand(1,10);
 	.@dfacehp = .@arr[UMOB_HP] + .@r_hpp;
-	.@r_hpp2 = 5200000 - ((13-.@mapcount) * 200000);
+	if ('hard)
+		.@r_hpp2 = 5200000 - ((13-.@mapcount) * 200000);
+	else
+		.@r_hpp2 = ( 5200000 - ((13-.@mapcount) * 200000) ) / 2;
 	if (.@dfacehp > .@r_hpp2)
 		.@dfacehp = .@r_hpp2;
 	setunitdata 'BOSS[3], UMOB_HP, .@dfacehp;
@@ -1113,7 +1134,7 @@ OnInstanceInit:
 1@face,2,5,3	script	#fwormcontrol4	CLEAR_NPC,{
 	end;
 OnStart:
-	.@mob_c = getmapusers('map_name$) + 1;
+	.@mob_c = ( 'hard ? 13 : 3 );
 	.@mon_num = .@mob_c * 6;
 	areamonster 'map_name$,250,94,330,174,"Faceworm",2528,.@mon_num,instance_npcname("#fwormcontrol4") + "::OnMyMobDead";
 	.@mon_num = .@mob_c * 5;
@@ -1161,6 +1182,8 @@ OnStart:
 	.@MOB_HP = 5200000 - .@dfacehp;
 	if (.@MOB_HP < 1500000)
 		.@MOB_HP = 1500000;
+	if (!'hard)
+		.@MOB_HP /= 2;
 	setunitdata 'BOSS[4], UMOB_HP, .@MOB_HP;
 	initnpctimer;
 	end;
@@ -1397,7 +1420,10 @@ S_Heal:
 	else
 		.@r_hpp = .@mapcount * getarg(1);
 	.@dfacehp = .@arr[UMOB_HP] + .@r_hpp;
-	.@r_hpp2 = 52000000 - ((13-.@mapcount) * 2000000);
+	if ('hard)
+		.@r_hpp2 = 52000000 - ((13-.@mapcount) * 2000000);
+	else
+		.@r_hpp2 = 28000000 + (.@mapcount * 2000000);
 	if (.@dfacehp > .@r_hpp2)
 		.@dfacehp = .@r_hpp2;
 	setunitdata 'BOSS[5], UMOB_HP, .@dfacehp;
@@ -1498,7 +1524,10 @@ OnStart:
 	// monster 'map_name$,1,6,"Faceworm Queen's Life",2915,1,instance_npcname("#fwormboss5") + "::OnMyMobDead";
 	getunitdata 'BOSS[5],.@arr;
 	.@dfacehp = ( 13- getmapusers('map_name$) ) * 2000000;
-	.@MOB_HP2 = 52000000 - .@dfacehp;
+	if ('hard)
+		.@MOB_HP2 = 52000000 - .@dfacehp;
+	else
+		.@MOB_HP2 = 28000000 + ( getmapusers('map_name$) * 2000000 );
 	if (.@MOB_HP2 < 15000000)
 		.@MOB_HP2 = 15000000;
 	setunitdata 'BOSS[5], UMOB_HP, .@MOB_HP2;
@@ -1516,7 +1545,10 @@ OnTimer1000:
 OnTimer5555:
 	.@mapcount = getmapusers('map_name$);
 	if (.@mapcount < 1) {
-		setunitdata 'BOSS[5], UMOB_HP, 50000000;
+		if ('hard)
+			setunitdata 'BOSS[5], UMOB_HP, 50000000;
+		else
+			setunitdata 'BOSS[5], UMOB_HP, 28000000;
 		for ( .@i = 1; .@i <= 4; ++.@i )
 			donpcevent instance_npcname( "#fwormboss5" + .@i ) + "::OnEnd";
 		stopnpctimer;

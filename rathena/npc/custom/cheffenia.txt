@@ -86,65 +86,57 @@ OnInit:
 	killmonster "bossnia_04",.@extreme_event$;
 
 	// Facil: 9 MVPs unicos, escolhidos entre dificuldades 1 e 2.
-	deletearray .@pool[0],getarraysize(.@pool);
-	copyarray .@pool[0],.EasyPool[0],getarraysize(.EasyPool);
+	set .@pool_size,getarraysize(.EasyPool);
+	set .@offset,rand(.@pool_size);
 	for (set .@i,0; .@i<9; set .@i,.@i+1) {
-		set .@pick,rand(getarraysize(.@pool));
-		monster "bossnia_01",0,0,"--ja--",.@pool[.@pick],1,.@easy_event$;
-		deletearray .@pool[.@pick],1;
+		set .@pick,(.@offset + .@i) % .@pool_size;
+		monster "bossnia_01",0,0,"--ja--",.EasyPool[.@pick],10,.@easy_event$;
 	}
 
 	// Intermediaria: 14 MVPs unicos, escolhidos entre dificuldades 2 e 3.
-	deletearray .@pool[0],getarraysize(.@pool);
-	copyarray .@pool[0],.IntermediatePool[0],getarraysize(.IntermediatePool);
+	set .@pool_size,getarraysize(.IntermediatePool);
+	set .@offset,rand(.@pool_size);
 	for (set .@i,0; .@i<14; set .@i,.@i+1) {
-		set .@pick,rand(getarraysize(.@pool));
-		monster "bossnia_02",0,0,"--ja--",.@pool[.@pick],1,.@intermediate_event$;
-		deletearray .@pool[.@pick],1;
+		set .@pick,(.@offset + .@i) % .@pool_size;
+		monster "bossnia_02",0,0,"--ja--",.IntermediatePool[.@pick],10,.@intermediate_event$;
 	}
 
 	// Dificil: 10 MVPs unicos, escolhidos entre dificuldades 3 e 4.
-	deletearray .@pool[0],getarraysize(.@pool);
-	copyarray .@pool[0],.HardPool[0],getarraysize(.HardPool);
+	set .@pool_size,getarraysize(.HardPool);
+	set .@offset,rand(.@pool_size);
 	for (set .@i,0; .@i<10; set .@i,.@i+1) {
-		set .@pick,rand(getarraysize(.@pool));
-		monster "bossnia_03",0,0,"--ja--",.@pool[.@pick],1,.@hard_event$;
-		deletearray .@pool[.@pick],1;
+		set .@pick,(.@offset + .@i) % .@pool_size;
+		monster "bossnia_03",0,0,"--ja--",.HardPool[.@pick],10,.@hard_event$;
 	}
 
 	// Extrema: 6 MVPs unicos, todos da dificuldade 4.
-	deletearray .@pool[0],getarraysize(.@pool);
-	copyarray .@pool[0],.ExtremePool[0],getarraysize(.ExtremePool);
+	set .@pool_size,getarraysize(.ExtremePool);
+	set .@offset,rand(.@pool_size);
 	for (set .@i,0; .@i<6; set .@i,.@i+1) {
-		set .@pick,rand(getarraysize(.@pool));
-		monster "bossnia_04",0,0,"--ja--",.@pool[.@pick],1,.@extreme_event$;
-		deletearray .@pool[.@pick],1;
+		set .@pick,(.@offset + .@i) % .@pool_size;
+		monster "bossnia_04",0,0,"--ja--",.ExtremePool[.@pick],10,.@extreme_event$;
 	}
 	end;
 
 
 OnEasyMvpDead:
-	// Spawns dinamicos nao renascem sozinhos; reagendamos o mesmo MVP.
+	// Mantem dez unidades de cada MVP selecionado, sem tempo de espera.
 	set .@mob_id,killedrid;
-	sleep 1800000;
 	monster "bossnia_01",0,0,"--ja--",.@mob_id,1,strnpcinfo(3)+"::OnEasyMvpDead";
 	end;
 
 OnIntermediateMvpDead:
 	set .@mob_id,killedrid;
-	sleep 3600000;
 	monster "bossnia_02",0,0,"--ja--",.@mob_id,1,strnpcinfo(3)+"::OnIntermediateMvpDead";
 	end;
 
 OnHardMvpDead:
 	set .@mob_id,killedrid;
-	sleep 7200000;
 	monster "bossnia_03",0,0,"--ja--",.@mob_id,1,strnpcinfo(3)+"::OnHardMvpDead";
 	end;
 
 OnExtremeMvpDead:
 	set .@mob_id,killedrid;
-	sleep 7200000;
 	monster "bossnia_04",0,0,"--ja--",.@mob_id,1,strnpcinfo(3)+"::OnExtremeMvpDead";
 	end;
 }

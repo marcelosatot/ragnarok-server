@@ -1,0 +1,168 @@
+//===== rAthena Script =======================================
+//= Skill Copy Teacher
+//===== Description: =========================================
+//= Lets Rogue, Stalker and Shadow Chaser characters select a
+//= skill for Plagiarism or Reproduce without another player.
+//= The official plagiarizeskill() API performs the validation
+//= and keeps the copied skill state persistent.
+//============================================================
+
+prontera,174,180,4	script	Skill Copy Teacher	4_M_04,{
+	mes "[Skill Copy Teacher]";
+	mes "I can help you practice a skill for Plagiarism or Reproduce.";
+
+	.@plagiarism_lv = getskilllv("RG_PLAGIARISM");
+	.@reproduce_lv = getskilllv("SC_REPRODUCE");
+
+	if (!.@plagiarism_lv && !.@reproduce_lv) {
+		mes "You do not have Plagiarism or Reproduce.";
+		close;
+	}
+
+MainMenu:
+	.@plagiarism_lv = getskilllv("RG_PLAGIARISM");
+	.@reproduce_lv = getskilllv("SC_REPRODUCE");
+
+	mes "Choose which copied-skill slot you want to manage.";
+	next;
+
+	if (.@plagiarism_lv && .@reproduce_lv) {
+		switch (select("Copy with Plagiarism:Copy with Reproduce:Clear Plagiarism:Clear Reproduce:Cancel")) {
+		case 1:
+			.@mode = 1;
+			.@copy_lv = .@plagiarism_lv;
+			sc_end SC__REPRODUCE;
+			goto CategoryMenu;
+		case 2:
+			.@mode = 2;
+			.@copy_lv = .@reproduce_lv;
+			goto CategoryMenu;
+		case 3:
+			plagiarizeskillreset(1);
+			mes "Your Plagiarism skill has been cleared.";
+			close;
+		case 4:
+			plagiarizeskillreset(2);
+			sc_end SC__REPRODUCE;
+			mes "Your Reproduce skill has been cleared.";
+			close;
+		default:
+			close;
+		}
+	}
+
+	if (.@plagiarism_lv) {
+		switch (select("Copy with Plagiarism:Clear Plagiarism:Cancel")) {
+		case 1:
+			.@mode = 1;
+			.@copy_lv = .@plagiarism_lv;
+			sc_end SC__REPRODUCE;
+			goto CategoryMenu;
+		case 2:
+			plagiarizeskillreset(1);
+			mes "Your Plagiarism skill has been cleared.";
+			close;
+		default:
+			close;
+		}
+	}
+
+	if (.@reproduce_lv) {
+		switch (select("Copy with Reproduce:Clear Reproduce:Cancel")) {
+		case 1:
+			.@mode = 2;
+			.@copy_lv = .@reproduce_lv;
+			goto CategoryMenu;
+		case 2:
+			plagiarizeskillreset(2);
+			sc_end SC__REPRODUCE;
+			mes "Your Reproduce skill has been cleared.";
+			close;
+		default:
+			close;
+		}
+	}
+
+CategoryMenu:
+	mes "Choose a skill category.";
+	next;
+
+	if (.@mode == 2) {
+		switch (select("Combat:Magic:Support:Traps and special:Third-job skills:Back")) {
+		case 1:
+			setarray .@skill_id[0],5,7,42,46,47,62,212,250,251,253,254,263,267,271,272,421;
+			setarray .@skill_name$[0],"Bash (SM_BASH)","Magnum Break (SM_MAGNUM)","Mammonite (MC_MAMMONITE)","Double Strafing (AC_DOUBLE)","Arrow Shower (AC_SHOWER)","Bowling Bash (KN_BOWLINGBASH)","Back Stab (RG_BACKSTAP)","Shield Charge (CR_SHIELDCHARGE)","Shield Boomerang (CR_SHIELDBOOMERANG)","Holy Cross (CR_HOLYCROSS)","Grand Cross (CR_GRANDCROSS)","Triple Attack (MO_TRIPLEATTACK)","Finger Offensive (MO_FINGEROFFENSIVE)","Extremity Fist (MO_EXTREMITYFIST)","Chain Combo (MO_CHAINCOMBO)","Tornado Kick (TK_JUMPKICK)";
+			goto PickSkill;
+		case 2:
+			setarray .@skill_id[0],11,13,14,15,17,18,19,20,21,80,81,83,84,85,86,88,89,90,91,2213;
+			setarray .@skill_name$[0],"Napalm Beat (MG_NAPALMBEAT)","Soul Strike (MG_SOULSTRIKE)","Cold Bolt (MG_COLDBOLT)","Frost Diver (MG_FROSTDIVER)","Fire Ball (MG_FIREBALL)","Fire Wall (MG_FIREWALL)","Fire Bolt (MG_FIREBOLT)","Lightning Bolt (MG_LIGHTNINGBOLT)","Thunderstorm (MG_THUNDERSTORM)","Fire Pillar (WZ_FIREPILLAR)","Sightrasher (WZ_SIGHTRASHER)","Meteor Storm (WZ_METEOR)","Jupitel Thunder (WZ_JUPITEL)","Lord of Vermilion (WZ_VERMILION)","Water Ball (WZ_WATERBALL)","Frost Nova (WZ_FROSTNOVA)","Storm Gust (WZ_STORMGUST)","Earth Spike (WZ_EARTHSPIKE)","Heaven's Drive (WZ_HEAVENDRIVE)","Comet (WL_COMET)";
+			goto PickSkill;
+		case 3:
+			setarray .@skill_id[0],24,28,68,69,70,77,79,156,1001,1004,1006,1009,1015;
+			setarray .@skill_name$[0],"Ruwach (AL_RUWACH)","Heal (AL_HEAL)","Aspersio (PR_ASPERSIO)","Benedictio (PR_BENEDICTIO)","Sanctuary (PR_SANCTUARY)","Turn Undead (PR_TURNUNDEAD)","Magnus Exorcismus (PR_MAGNUS)","Holy Light (AL_HOLYLIGHT)","Charge Attack (KN_CHARGEATK)","Venom Knife (AS_VENOMKNIFE)","Sight Blaster (WZ_SIGHTBLASTER)","Phantasmic Arrow (HT_PHANTASMIC)","Ki Translation (MO_KITRANSLATION)";
+			goto PickSkill;
+		case 4:
+			setarray .@skill_id[0],116,121,122,123,229,230,337,526,527,528,529,530,531,534,535,536,537,539,540,541,542;
+			setarray .@skill_name$[0],"Land Mine (HT_LANDMINE)","Freezing Trap (HT_FREEZINGTRAP)","Blast Mine (HT_BLASTMINE)","Claymore Trap (HT_CLAYMORETRAP)","Demonstration (AM_DEMONSTRATION)","Acid Terror (AM_ACIDTERROR)","Tomahawk (ITM_TOMAHAWK)","Throw Zeny (NJ_ZENYNAGE)","Tatami Gaeshi (NJ_TATAMIGAESHI)","Kasumi Shuriken (NJ_KASUMIKIRI)","Shadow Jump (NJ_SHADOWJUMP)","Kirikage (NJ_KIRIKAGE)","Utsusemi (NJ_UTSUSEMI)","Kouenka (NJ_KOUENKA)","Kaensin (NJ_KAENSIN)","Bakuenryu (NJ_BAKUENRYU)","Hyousensou (NJ_HYOUSENSOU)","Hyousyouraku (NJ_HYOUSYOURAKU)","HuuJin (NJ_HUUJIN)","Raigekisai (NJ_RAIGEKISAI)","Kamaitachi (NJ_KAMAITACHI)";
+			goto PickSkill;
+		case 5:
+			setarray .@skill_id[0],2002,2202,2038,2054,2233,2284,2288,2304,2310,2326,2413,2447,2483;
+			setarray .@skill_name$[0],"Sonic Wave (RK_SONICWAVE)","Soul Expansion (WL_SOULEXPANSION)","Judex (AB_JUDEX)","Gemini Lumen (AB_DUPLELIGHT)","Arrow Storm (RA_ARROWSTORM)","Fatal Menace (SC_FATALMENACE)","Triangle Shot (SC_TRIANGLESHOT)","Feint Bomb (SC_FEINTBOMB)","Shield Press (LG_SHIELDPRESS)","Dragon Combo (SR_DRAGONCOMBO)","Metallic Sound (WM_METALICSOUND)","Diamond Dust (SO_DIAMONDDUST)","Crazy Weed (GN_CRAZYWEED)";
+			goto PickSkill;
+		default:
+			goto MainMenu;
+		}
+	}
+
+	switch (select("Combat:Magic:Support:Traps and special:Back")) {
+	case 1:
+		setarray .@skill_id[0],5,7,42,46,47,62,212,250,251,253,254,263,267,271,272,421;
+		setarray .@skill_name$[0],"Bash (SM_BASH)","Magnum Break (SM_MAGNUM)","Mammonite (MC_MAMMONITE)","Double Strafing (AC_DOUBLE)","Arrow Shower (AC_SHOWER)","Bowling Bash (KN_BOWLINGBASH)","Back Stab (RG_BACKSTAP)","Shield Charge (CR_SHIELDCHARGE)","Shield Boomerang (CR_SHIELDBOOMERANG)","Holy Cross (CR_HOLYCROSS)","Grand Cross (CR_GRANDCROSS)","Triple Attack (MO_TRIPLEATTACK)","Finger Offensive (MO_FINGEROFFENSIVE)","Extremity Fist (MO_EXTREMITYFIST)","Chain Combo (MO_CHAINCOMBO)","Tornado Kick (TK_JUMPKICK)";
+		goto PickSkill;
+	case 2:
+	setarray .@skill_id[0],11,13,14,15,17,18,19,20,21,80,81,83,84,85,86,88,89,90,91;
+	setarray .@skill_name$[0],"Napalm Beat (MG_NAPALMBEAT)","Soul Strike (MG_SOULSTRIKE)","Cold Bolt (MG_COLDBOLT)","Frost Diver (MG_FROSTDIVER)","Fire Ball (MG_FIREBALL)","Fire Wall (MG_FIREWALL)","Fire Bolt (MG_FIREBOLT)","Lightning Bolt (MG_LIGHTNINGBOLT)","Thunderstorm (MG_THUNDERSTORM)","Fire Pillar (WZ_FIREPILLAR)","Sightrasher (WZ_SIGHTRASHER)","Meteor Storm (WZ_METEOR)","Jupitel Thunder (WZ_JUPITEL)","Lord of Vermilion (WZ_VERMILION)","Water Ball (WZ_WATERBALL)","Frost Nova (WZ_FROSTNOVA)","Storm Gust (WZ_STORMGUST)","Earth Spike (WZ_EARTHSPIKE)","Heaven's Drive (WZ_HEAVENDRIVE)";
+		goto PickSkill;
+	case 3:
+		setarray .@skill_id[0],24,28,68,69,70,77,79,156,1001,1004,1006,1009,1015;
+		setarray .@skill_name$[0],"Ruwach (AL_RUWACH)","Heal (AL_HEAL)","Aspersio (PR_ASPERSIO)","Benedictio (PR_BENEDICTIO)","Sanctuary (PR_SANCTUARY)","Turn Undead (PR_TURNUNDEAD)","Magnus Exorcismus (PR_MAGNUS)","Holy Light (AL_HOLYLIGHT)","Charge Attack (KN_CHARGEATK)","Venom Knife (AS_VENOMKNIFE)","Sight Blaster (WZ_SIGHTBLASTER)","Phantasmic Arrow (HT_PHANTASMIC)","Ki Translation (MO_KITRANSLATION)";
+		goto PickSkill;
+	case 4:
+		setarray .@skill_id[0],116,121,122,123,229,230,337,526,527,528,529,530,531,534,535,536,537,539,540,541,542;
+		setarray .@skill_name$[0],"Land Mine (HT_LANDMINE)","Freezing Trap (HT_FREEZINGTRAP)","Blast Mine (HT_BLASTMINE)","Claymore Trap (HT_CLAYMORETRAP)","Demonstration (AM_DEMONSTRATION)","Acid Terror (AM_ACIDTERROR)","Tomahawk (ITM_TOMAHAWK)","Throw Zeny (NJ_ZENYNAGE)","Tatami Gaeshi (NJ_TATAMIGAESHI)","Kasumi Shuriken (NJ_KASUMIKIRI)","Shadow Jump (NJ_SHADOWJUMP)","Kirikage (NJ_KIRIKAGE)","Utsusemi (NJ_UTSUSEMI)","Kouenka (NJ_KOUENKA)","Kaensin (NJ_KAENSIN)","Bakuenryu (NJ_BAKUENRYU)","Hyousensou (NJ_HYOUSENSOU)","Hyousyouraku (NJ_HYOUSYOURAKU)","HuuJin (NJ_HUUJIN)","Raigekisai (NJ_RAIGEKISAI)","Kamaitachi (NJ_KAMAITACHI)";
+		goto PickSkill;
+	default:
+		goto MainMenu;
+	}
+
+PickSkill:
+	mes "Choose the skill you want to copy.";
+	next;
+	.@choice = select(implode(.@skill_name$,":")+":Back");
+	if (.@choice > getarraysize(.@skill_id))
+		goto CategoryMenu;
+
+	.@selected_id = .@skill_id[.@choice-1];
+	.@selected_name$ = .@skill_name$[.@choice-1];
+	mes "Selected: "+.@selected_name$+".";
+	mes "Choose the copied skill level.";
+	next;
+	.@level_menu$ = "";
+	for (.@i = 1; .@i <= .@copy_lv; .@i++)
+		.@level_menu$ += "Level "+.@i+":";
+	.@selected_lv = select(.@level_menu$);
+
+	if (.@mode == 2)
+		sc_start SC__REPRODUCE,300000,.@copy_lv;
+	else
+		sc_end SC__REPRODUCE;
+
+	if (plagiarizeskill(.@selected_id,.@selected_lv)) {
+		mes "The skill was copied successfully at level "+.@selected_lv+".";
+		mes "The previous copied skill, if any, was replaced.";
+	} else {
+		mes "This skill cannot be copied by the selected skill in the current skill database.";
+		mes "No change was made to your previous copied skill.";
+	}
+	close;
+}

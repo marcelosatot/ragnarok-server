@@ -634,8 +634,14 @@ int32 instance_create(int32 owner_id, const char *name, e_instance_mode mode) {
 				ShowError("instance_create: Party %d not found for instance '%s'.\n", owner_id, name);
 				return -2;
 			}
-			if (pd->instance_id > 0)
-				return -3; // Party already instancing
+			if (pd->instance_id > 0) {
+				if (instances.find(pd->instance_id) != instances.end())
+					return -3; // Party already instancing
+
+				// The party can retain an instance handle after the instance was
+				// destroyed. Clear the stale handle so a new instance can be created.
+				pd->instance_id = 0;
+			}
 			break;
 		case IM_GUILD:
 			if (!(gd = guild_search(owner_id))) {
